@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="space-y-8">
+
+  <h1 class="text-2xl font-bold mb-2">Panel municipal</h1>
+  <p class="text-sm text-gray-600 mb-4">
+    Gestión de emprendimientos registrados por la comunidad. Desde aquí puedes
+    <strong>revisar, aprobar o rechazar</strong> los registros, y ver un resumen
+    del estado actual de la plataforma.
+  </p>
+
+  {# ====== TARJETAS RESUMEN (KPIs) ====== #}
+  <section class="grid md:grid-cols-3 gap-4">
+    <div class="bg-white rounded-2xl shadow border p-4">
+      <p class="text-xs text-gray-500 uppercase font-semibold">Total registrados</p>
+      <p class="text-2xl font-bold mt-1">
+        {{ pendientes|length|add:aprobados|length }}
+      </p>
+      <p class="text-xs text-gray-500 mt-1">
+        Emprendimientos creados por la comunidad.
+      </p>
+    </div>
+
+    <div class="bg-yellow-50 rounded-2xl shadow border border-yellow-200 p-4">
+      <p class="text-xs text-yellow-700 uppercase font-semibold">Pendientes</p>
+      <p class="text-2xl font-bold mt-1 text-yellow-800">
+        {{ pendientes|length }}
+      </p>
+      <p class="text-xs text-yellow-700 mt-1">
+        Aún requieren revisión municipal.
+      </p>
+    </div>
+
+    <div class="bg-green-50 rounded-2xl shadow border border-green-200 p-4">
+      <p class="text-xs text-green-700 uppercase font-semibold">Aprobados</p>
+      <p class="text-2xl font-bold mt-1 text-green-800">
+        {{ aprobados|length }}
+      </p>
+      <p class="text-xs text-green-700 mt-1">
+        Visibles en el directorio público.
+      </p>
+    </div>
+  </section>
+
+  {# ====== MENSAJES (aprobado / rechazado) ====== #}
+  {% if messages %}
+    <div class="space-y-2">
+      {% for message in messages %}
+        <div class="px-3 py-2 rounded text-sm
+             {% if message.tags == 'success' %}bg-green-50 text-green-800 border border-green-200
+             {% elif message.tags == 'warning' %}bg-yellow-50 text-yellow-800 border border-yellow-200
+             {% else %}bg-gray-50 text-gray-800 border{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {# ====== PENDIENTES ====== #}
+  <section class="bg-white rounded-2xl shadow border p-5">
+    <h2 class="text-xl font-semibold mb-3">Emprendimientos pendientes de revisión</h2>
+
+    {% if pendientes %}
+      <div class="divide-y">
+        {% for e in pendientes %}
+          <article class="py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+              <p class="font-semibold">{{ e.nombre }}</p>
+              <p class="text-xs text-gray-500">
+                {{ e.get_categoria_display }}{% if e.rubro %} • {{ e.rubro }}{% endif %}
+              </p>
+              <p class="text-xs text-gray-500">
+                Registrado por: {{ e.owner.username }}
+              </p>
+              {# solo si tienes campo visitas / created_at en el modelo #}
+              {% if e.visitas %}
+                <p class="text-xs text-gray-400">
+                  Visitas al perfil: {{ e.visitas }}
+                </p>
+              {% endif %}
+            </div>
+            <div class="flex flex-wrap gap-2 text-sm">
+              <a href="{% url 'emprendimiento_detalle' e.pk %}"
+                 class="px-3 py-1 rounded border text-gray-700 hover:bg-gray-50">
+                Ver detalle
+              </a>
+              <a href="{% url 'aprobar_emprendimiento' e.pk %}"
+                 class="px-3 py-1 rounded bg-green-600 text-white hover:bg-green-700">
+                Aprobar
+              </a>
+              <a href="{% url 'rechazar_emprendimiento' e.pk %}"
+                 class="px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700"
+                 onclick="return confirm('¿Rechazar y eliminar este emprendimiento?');">
+                Rechazar
+              </a>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-sm text-gray-500">No hay emprendimientos pendientes.</p>
+    {% endif %}
+  </section>
+
+  {# ====== APROBADOS ====== #}
+  <section class="bg-white rounded-2xl shadow border p-5">
+    <h2 class="text-xl font-semibold mb-3">Emprendimientos aprobados</h2>
+
+    {% if aprobados %}
+      <div class="grid md:grid-cols-2 gap-4">
+        {% for e in aprobados %}
+          <article class="border rounded-xl p-4 flex flex-col gap-2">
+            <div class="flex items-center justify-between">
+              <h3 class="font-semibold">{{ e.nombre }}</h3>
+              <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold">
+                ✓ Verificado
+              </span>
+            </div>
+            <p class="text-xs text-gray-500">
+              {{ e.get_categoria_display }}{% if e.rubro %} • {{ e.rubro }}{% endif %}
+            </p>
+            {% if e.direccion %}
+              <p class="text-xs text-gray-600">{{ e.direccion }}</p>
+            {% endif %}
+            {% if e.visitas %}
+              <p class="text-xs text-gray-400">
+                Visitas al perfil: {{ e.visitas }}
+              </p>
+            {% endif %}
+            <div class="flex justify-end">
+              <a href="{% url 'emprendimiento_detalle' e.pk %}"
+                 class="text-xs text-green-700 underline">
+                Ver en directorio
+              </a>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-sm text-gray-500">Aún no hay emprendimientos aprobados.</p>
+    {% endif %}
+  </section>
+
+</div>
+{% endblock %}

@@ -1,0 +1,123 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}Municipal de Paillaco{% endblock %}</title>
+
+  <!-- Tailwind desde CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Swiper CSS (para sliders) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+</head>
+
+<body class="bg-gray-50 text-gray-900">
+
+  <!-- BARRA SUPERIOR VERDE -->
+  <header class="bg-green-700 text-white shadow">
+    <nav class="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
+
+      <!-- Logo + texto -->
+      <a href="{% url 'home' %}" class="flex items-center gap-3">
+        <div class="h-10 w-10 rounded-full bg-white flex items-center justify-center shadow">
+          <img
+            src="https://www.munipaillaco.cl/wp-content/themes/munipaillaco-theme/images/logo_muni_transparente.png"
+            alt="Municipalidad de Paillaco"
+            class="h-8 w-8 object-contain"
+          />
+        </div>
+        <span class="font-semibold text-white text-lg">
+          Municipalidad de Paillaco
+        </span>
+      </a>
+
+      <!-- Menú -->
+      <div class="flex items-center gap-4 text-sm">
+        <a href="{% url 'home' %}" class="hover:text-gray-200">Inicio</a>
+        <a href="{% url 'directory' %}" class="hover:text-gray-200">Emprendimientos</a>
+
+        {% if user.is_authenticated %}
+          <a href="{% url 'mis_emprendimientos' %}" class="hover:text-gray-200">Mis emprendimientos</a>
+
+          <!-- 🛒 CARRITO -->
+          <a href="{% url 'ver_carrito' %}"
+             class="flex items-center gap-1 px-3 py-1 rounded hover:bg-green-800">
+            <span>🛒</span>
+            {% if carrito_count and carrito_count > 0 %}
+              <span>Carrito ({{ carrito_count }})</span>
+            {% else %}
+              <span>Carrito</span>
+            {% endif %}
+          </a>
+
+          {% if user.is_staff %}
+            <a href="{% url 'panel_municipal' %}" class="hover:text-gray-200">Panel municipal</a>
+          {% endif %}
+
+          {% if user.is_superuser %}
+            <a href="{% url 'panel_admin' %}" class="hover:text-gray-200">Panel admin</a>
+          {% endif %}
+
+          <a href="{% url 'emprendimiento_registrar' %}"
+             class="px-3 py-1 border border-white rounded font-medium hover:bg-green-600 hover:text-white">
+            Registrar emprendimiento
+          </a>
+
+          <!-- Menú usuario -->
+          <div class="relative group">
+            <button class="px-3 py-1 rounded hover:bg-green-800 flex items-center gap-1">
+              <span class="font-semibold">{{ user.username }}</span>
+              <span class="text-xs">▼</span>
+            </button>
+            <div class="absolute right-0 mt-1 w-40 bg-white text-gray-800 rounded shadow-lg border
+                        opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition">
+              <a href="{% url 'profile' %}" class="block px-3 py-2 text-sm hover:bg-gray-100">Mi perfil</a>
+              <a href="{% url 'logout' %}" class="block px-3 py-2 text-sm hover:bg-gray-100">Cerrar sesión</a>
+            </div>
+          </div>
+
+        {% else %}
+          <a href="/cuenta/ingresar/" class="px-3 py-1 rounded hover:bg-green-800">Ingresar</a>
+          <a href="{% url 'signup' %}"
+             class="px-3 py-1 bg-white text-green-700 rounded font-medium hover:bg-gray-100">
+            Crear cuenta
+          </a>
+        {% endif %}
+      </div>
+
+    </nav>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="mx-auto max-w-7xl px-4 py-8">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Swiper JS -->
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+  <!-- Inicialización global del slider -->
+  <script>
+    if (document.querySelector(".mySwiper")) {
+      var swiper = new Swiper(".mySwiper", {
+        loop: true,
+        autoplay: {
+          delay: 3500,
+          disableOnInteraction: false,
+        },
+        pagination: {
+          el: ".swiper-pagination",
+          clickable: true,
+        },
+        navigation: {
+          nextEl: ".swiper-button-next",
+          prevEl: ".swiper-button-prev",
+        },
+      });
+    }
+  </script>
+
+</body>
+</html>

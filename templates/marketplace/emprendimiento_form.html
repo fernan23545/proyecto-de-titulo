@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="max-w-4xl mx-auto p-6">
+
+    <h1 class="text-3xl font-bold text-green-700 mb-6">
+        {{ titulo }}
+    </h1>
+
+    <form method="POST" enctype="multipart/form-data" class="space-y-8">
+        {% csrf_token %}
+
+        <!-- CARD GENERAL -->
+        <div class="bg-white shadow-lg border border-green-200 rounded-2xl p-6">
+            <h2 class="text-xl font-semibold text-green-700 mb-4">Información General</h2>
+
+            <div class="grid md:grid-cols-2 gap-6">
+
+                <div>
+                    <label class="font-semibold text-gray-700">Nombre</label>
+                    <input class="w-full mt-1 rounded-lg border-gray-300 focus:ring-green-500 focus:border-green-500"
+                           type="text"
+                           name="{{ form.nombre.html_name }}"
+                           value="{{ form.nombre.value|default:'' }}">
+                </div>
+
+                <div>
+                    <label class="font-semibold text-gray-700">Categoría</label>
+                    {{ form.categoria }}
+                </div>
+
+                <div>
+                    <label class="font-semibold text-gray-700">Rubro</label>
+                    <input class="w-full mt-1 rounded-lg border-gray-300 focus:ring-green-500 focus:border-green-500"
+                           type="text"
+                           name="{{ form.rubro.html_name }}"
+                           value="{{ form.rubro.value|default:'' }}">
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="font-semibold text-gray-700">Descripción</label>
+                    {{ form.descripcion }}
+                </div>
+
+            </div>
+        </div>
+
+        <!-- CARD CONTACTO -->
+        <div class="bg-white shadow-lg border border-green-200 rounded-2xl p-6">
+            <h2 class="text-xl font-semibold text-green-700 mb-4">Información de Contacto</h2>
+
+            <div class="grid md:grid-cols-2 gap-6">
+
+                <div>
+                    <label class="font-semibold text-gray-700">Dirección</label>
+                    {{ form.direccion }}
+                </div>
+
+                <div>
+                    <label class="font-semibold text-gray-700">Teléfono</label>
+                    {{ form.telefono }}
+                </div>
+
+                <div>
+                    <label class="font-semibold text-gray-700">Email de contacto</label>
+                    {{ form.email_contacto }}
+                </div>
+
+                <div>
+                    <label class="font-semibold text-gray-700">Sitio web o redes sociales</label>
+                    {{ form.sitio_web }}
+                </div>
+
+            </div>
+        </div>
+
+        <!-- CARD IMÁGENES -->
+        <div class="bg-white shadow-lg border border-green-200 rounded-2xl p-6">
+            <h2 class="text-xl font-semibold text-green-700 mb-4">Imágenes del emprendimiento</h2>
+
+            <!-- Imagen Principal -->
+            <div class="mb-6">
+                <label class="font-semibold text-gray-700">Imagen principal</label>
+
+                {% if form.instance.imagen %}
+                    <div class="mt-2 mb-3">
+                        <img src="{{ form.instance.imagen.url }}" class="h-32 rounded-xl shadow">
+                    </div>
+                {% endif %}
+
+                <input type="file" name="imagen"
+                       class="mt-2 w-full text-sm text-gray-700 file:bg-green-600 file:text-white
+                              file:px-4 file:py-2 file:rounded-lg file:border-none hover:file:bg-green-700" />
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+
+                <!-- Imagen 1 -->
+                <div>
+                    <label class="font-semibold text-gray-700">Imagen 1</label>
+
+                    {% if form.instance.imagen1 %}
+                        <img src="{{ form.instance.imagen1.url }}" class="h-28 rounded shadow mb-2">
+                    {% endif %}
+
+                    <input type="file" name="imagen1"
+                           class="mt-2 w-full text-sm text-gray-700 file:bg-green-600 file:text-white
+                                  file:px-3 file:py-2 file:rounded-lg file:border-none hover:file:bg-green-700" />
+                </div>
+
+                <!-- Imagen 2 -->
+                <div>
+                    <label class="font-semibold text-gray-700">Imagen 2</label>
+
+                    {% if form.instance.imagen2 %}
+                        <img src="{{ form.instance.imagen2.url }}" class="h-28 rounded shadow mb-2">
+                    {% endif %}
+
+                    <input type="file" name="imagen2"
+                           class="mt-2 w-full text-sm text-gray-700 file:bg-green-600 file:text-white
+                                  file:px-3 file:py-2 file:rounded-lg file:border-none hover:file:bg-green-700" />
+                </div>
+
+                <!-- Imagen 3 -->
+                <div>
+                    <label class="font-semibold text-gray-700">Imagen 3</label>
+
+                    {% if form.instance.imagen3 %}
+                        <img src="{{ form.instance.imagen3.url }}" class="h-28 rounded shadow mb-2">
+                    {% endif %}
+
+                    <input type="file" name="imagen3"
+                           class="mt-2 w-full text-sm text-gray-700 file:bg-green-600 file:text-white
+                                  file:px-3 file:py-2 file:rounded-lg file:border-none hover:file:bg-green-700" />
+                </div>
+
+            </div>
+        </div>
+
+        <!-- BOTONES -->
+        <div class="flex justify-between items-center">
+            <a href="{% url 'mis_emprendimientos' %}"
+               class="text-gray-600 underline hover:text-gray-900">
+                Cancelar
+            </a>
+
+            <button
+                class="px-6 py-2 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 shadow">
+                Guardar cambios
+            </button>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

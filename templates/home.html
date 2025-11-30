@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block title %}Plataforma Digital de Emprendimientos – Paillaco{% endblock %}
+
+{% block content %}
+<div class="space-y-12">
+
+  <!-- ============================== -->
+  <!-- 1) HERO -->
+  <!-- ============================== -->
+  <section class="bg-white rounded-3xl shadow border px-8 py-10 grid lg:grid-cols-2 gap-10 items-center">
+
+    <!-- Texto -->
+    <div class="space-y-4">
+      <p class="text-xs font-semibold uppercase tracking-wide text-green-700">
+        Nueva plataforma municipal de emprendimientos
+      </p>
+
+      <h1 class="text-3xl md:text-4xl font-extrabold leading-tight">
+        Plataforma Digital de
+        <span class="text-green-700">Emprendimientos Locales</span>
+      </h1>
+
+      <p class="text-sm md:text-base text-gray-700">
+        Conectamos emprendedores con la comunidad. Registro oficial, agenda digital,
+        seguimiento de servicios y respaldo municipal para hacer crecer tu negocio.
+      </p>
+
+      <div class="flex flex-wrap gap-3 pt-2">
+        <a href="{% url 'directory' %}"
+           class="px-5 py-2.5 rounded-full bg-green-600 text-white text-sm font-semibold hover:bg-green-700">
+          Explorar Emprendimiento
+        </a>
+
+        {% if user.is_authenticated %}
+          <a href="{% url 'emprendimiento_registrar' %}"
+             class="px-5 py-2.5 rounded-full border border-green-600 text-green-700 text-sm font-semibold hover:bg-green-50">
+            Registrar mi Negocio
+          </a>
+        {% else %}
+          <a href="/cuenta/ingresar/"
+             class="px-5 py-2.5 rounded-full border border-gray-300 text-gray-800 text-sm font-semibold hover:bg-gray-50">
+            Ingresar / Crear cuenta
+          </a>
+        {% endif %}
+      </div>
+
+      <div class="flex flex-wrap gap-3 pt-4 text-xs text-gray-600">
+        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gray-100">✅ +100 emprendimientos</span>
+        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-50 text-green-700">🛡️ Sello municipal</span>
+        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gray-100">📅 Reservas online</span>
+      </div>
+    </div>
+
+    <!-- SLIDER HERO -->
+<div class="flex justify-center">
+  <div class="rounded-3xl overflow-hidden shadow-lg border bg-gray-100 max-w-md w-full">
+
+    <div class="swiper mySwiper">
+      <div class="swiper-wrapper">
+
+        {% if hero_images %}
+          {% for img in hero_images %}
+            <div class="swiper-slide">
+              <img src="{{ img }}" class="w-full h-64 object-cover">
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="swiper-slide">
+            <img src="https://images.unsplash.com/photo-1529699211952-734e80c4d42b?auto=format&fit=crop&w=900&q=80"
+                 class="w-full h-64 object-cover">
+          </div>
+        {% endif %}
+
+      </div>
+
+      <div class="swiper-pagination"></div>
+      <div class="swiper-button-next"></div>
+      <div class="swiper-button-prev"></div>
+    </div>
+
+  </div>
+</div>
+
+
+  </section>
+
+  <!-- ============================== -->
+  <!-- 2) INFORMACIÓN CENTRAL -->
+  <!-- ============================== -->
+  <section class="bg-white rounded-3xl shadow border px-8 py-10 grid lg:grid-cols-2 gap-10">
+
+    <!-- Texto -->
+    <div class="space-y-6">
+      <div>
+        <h2 class="text-2xl font-bold">
+          Registra tu emprendimiento con <span class="text-green-700">respaldo municipal</span>
+        </h2>
+        <p class="text-sm text-gray-700 mt-2">
+          Obtén el sello municipal de confianza y accede a herramientas digitales
+          para hacer crecer tu negocio.
+        </p>
+      </div>
+
+      <div>
+        <h3 class="text-sm font-semibold mb-2 text-gray-800">Beneficios del registro</h3>
+        <ul class="text-sm text-gray-700 space-y-1">
+          <li>• Sello Municipal de Confianza</li>
+          <li>• Mayor visibilidad</li>
+          <li>• Agenda digital integrada</li>
+          <li>• Métricas y análisis de visitas</li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="text-sm font-semibold mb-2 text-gray-800">Proceso de registro</h3>
+        <ol class="text-sm text-gray-700 space-y-1 list-decimal list-inside">
+          <li>Completa el formulario.</li>
+          <li>La municipalidad revisa.</li>
+          <li>Tu ficha se publica.</li>
+        </ol>
+      </div>
+
+      {% if user.is_authenticated %}
+        <a href="{% url 'emprendimiento_registrar' %}"
+           class="inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-green-600 text-white text-sm font-semibold hover:bg-green-700">
+          Iniciar registro ahora
+        </a>
+      {% else %}
+        <p class="text-xs text-gray-500">
+          Para registrar un emprendimiento, primero debes
+          <a href="/cuenta/ingresar/" class="text-green-700 underline">ingresar</a>.
+        </p>
+      {% endif %}
+    </div>
+
+    <!-- Imagen -->
+    <div class="flex justify-center">
+      <div class="rounded-2xl overflow-hidden shadow bg-gray-100 max-w-md w-full">
+        <img
+          src="https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=900&q=80"
+          class="w-full h-full object-cover"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== -->
+  <!-- 3) DIRECTORIO CLÁSICO -->
+  <!-- ============================== -->
+  <section>
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-semibold">Explorar de emprendimientos</h2>
+      <a href="{% url 'directory' %}" class="text-xs text-green-700 underline">Ver todo</a>
+    </div>
+
+    <div class="bg-white rounded-3xl shadow border p-5">
+
+      <!-- Chips -->
+      <div class="flex flex-wrap gap-2 text-xs mb-4">
+        <a href="{% url 'directory' %}"
+           class="px-3 py-1 rounded-full bg-green-600 text-white font-semibold">Todos</a>
+
+        {% for value,label in categorias %}
+          <a href="{% url 'directory' %}?categoria={{ value }}"
+             class="px-3 py-1 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200">
+            {{ label }}
+          </a>
+        {% endfor %}
+      </div>
+
+      {% if emprendimientos_home %}
+      <div class="grid md:grid-cols-3 gap-4">
+        {% for e in emprendimientos_home %}
+        <article class="border rounded-2xl overflow-hidden bg-white shadow-sm flex flex-col">
+
+          <div class="h-28 bg-cover bg-center"
+               style="background-image:url('{% if e.imagen %}{{ e.imagen.url }}{% else %}
+               https://images.unsplash.com/photo-1529699211952-734e80c4d42b{% endif %}');">
+          </div>
+
+          <div class="p-3 space-y-1 flex-1 flex flex-col">
+
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <span class="inline-block text-[10px] px-2 py-0.5 rounded-full bg-green-100 text-green-700 mb-1">
+                  {{ e.get_categoria_display }}
+                </span>
+                <h3 class="font-semibold text-sm">{{ e.nombre }}</h3>
+              </div>
+
+              {% if e.is_verified %}
+                <span class="text-[10px] text-gray-500">Verificado ✓</span>
+              {% endif %}
+            </div>
+
+            {% if e.descripcion %}
+            <p class="text-xs text-gray-600 flex-1">
+              {{ e.descripcion|truncatechars:110 }}
+            </p>
+            {% endif %}
+
+            <div class="text-[11px] text-gray-500 mt-1">
+              {% if e.direccion %}📍 {{ e.direccion }}{% endif %}
+            </div>
+
+            <div class="mt-2 flex gap-2">
+              <a href="{% url 'emprendimiento_detalle' e.pk %}"
+                 class="flex-1 text-[11px] px-3 py-1.5 rounded-full border border-gray-300 text-center hover:bg-gray-50">
+                Ver perfil
+              </a>
+
+              <a href="{% url 'emprendimiento_detalle' e.pk %}#productos"
+                 class="flex-1 text-[11px] px-3 py-1.5 rounded-full bg-green-600 text-white text-center hover:bg-green-700">
+                Ir a productos/servicios
+              </a>
+            </div>
+
+          </div>
+
+        </article>
+        {% endfor %}
+      </div>
+
+      {% else %}
+      <p class="text-sm text-gray-600">Aún no hay emprendimientos aprobados.</p>
+      {% endif %}
+
+    </div>
+  </section>
+
+</div>
+{% endblock %}

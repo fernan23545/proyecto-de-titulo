@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="relative min-h-[80vh] rounded-2xl overflow-hidden">
+
+  <!-- Fondo dinámico -->
+  <div class="absolute inset-0">
+    <div id="bg-paillaco" class="w-full h-full bg-cover bg-center transition-all duration-700"></div>
+    <div class="absolute inset-0 bg-black/35"></div>
+  </div>
+
+  <!-- Contenido (tarjeta) -->
+  <div class="relative z-10 flex items-center justify-center min-h-[80vh] p-6">
+    <div class="w-full max-w-2xl bg-white/60 backdrop-blur-md border border-white/60 rounded-2xl shadow-xl p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <img src="https://datos.gob.cl/uploads/group/2015-12-03-140749.826547logomunitransparente.png"
+             class="h-10 w-10 object-contain" alt="Paillaco">
+        <h1 class="text-2xl font-bold">Crear cuenta</h1>
+      </div>
+
+      {% if form.errors %}
+        <div class="mb-4 p-3 rounded bg-red-50 text-red-700 text-sm">
+          Por favor corrige los errores marcados.
+        </div>
+      {% endif %}
+
+      <form method="post" class="grid md:grid-cols-2 gap-4">
+        {% csrf_token %}
+
+        <div>
+          <label class="block text-sm font-medium">Nombre</label>
+          {{ form.first_name }}
+          {{ form.first_name.errors }}
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium">Apellido</label>
+          {{ form.last_name }}
+          {{ form.last_name.errors }}
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium">Correo</label>
+          {{ form.email }}
+          {{ form.email.errors }}
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium">Teléfono</label>
+          {{ form.phone }}
+          {{ form.phone.errors }}
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium">Usuario</label>
+          {{ form.username }}
+          {{ form.username.errors }}
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium">Contraseña</label>
+          {{ form.password1 }}
+          {{ form.password1.errors }}
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium">Repite la contraseña</label>
+          {{ form.password2 }}
+          {{ form.password2.errors }}
+        </div>
+
+        <div class="md:col-span-2">
+          <button class="w-full px-4 py-2 rounded bg-green-600 text-white">Registrarme</button>
+          <p class="text-sm mt-3 text-center">
+            ¿Ya tienes cuenta? <a href="{% url 'login' %}" class="underline">Ingresar</a>
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Script para rotar imágenes de fondo -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const bg = document.getElementById("bg-paillaco");
+    if (!bg) return;
+
+    const imagenes = [
+      "https://i0.wp.com/www.eurosan.hn/wp-content/uploads/2021/10/1.png?fit=720%2C424",
+      "https://www.somosnoticias.cl/wp-content/uploads/2024/10/Municipalidad-de-Paillaco.jpeg",
+      "https://www.nostalgica.cl/wp-content/uploads/2020/02/pexels-photo-1047460-1024x683-1.jpeg",
+      "https://www.lanacion.cl/wp-content/uploads/2020/07/1246a880-beebar-2-fia-scaled.jpg"
+    ];
+
+    let index = 0;
+
+    function cambiarFondo() {
+      bg.style.backgroundImage = `url('${imagenes[index]}')`;
+      index = (index + 1) % imagenes.length;
+    }
+
+    cambiarFondo();
+    setInterval(cambiarFondo, 2000);
+  });
+</script>
+
+{% endblock %}

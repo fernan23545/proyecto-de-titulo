@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-lg mx-auto bg-white shadow rounded-xl p-6 mt-10 text-center">
+
+  <h1 class="text-xl font-bold mb-4 text-red-600">
+    ¿Eliminar emprendimiento?
+  </h1>
+
+  <p class="mb-6 text-gray-700">
+    Estás a punto de eliminar <strong>{{ emprendimiento.nombre }}</strong>.  
+    Esta acción no se puede deshacer.
+  </p>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="flex justify-center gap-4">
+      <a href="{% url 'emprendimiento_detalle' emprendimiento.pk %}"
+         class="px-4 py-2 bg-gray-200 rounded-lg text-gray-800">
+        Cancelar
+      </a>
+
+      <button type="submit"
+              class="px-4 py-2 bg-red-600 rounded-lg text-white hover:bg-red-700">
+        Eliminar definitivamente
+      </button>
+    </div>
+  </form>
+
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+  <h1 class="text-2xl font-bold mb-4">Carrito</h1>
+
+  {% if items %}
+    <div class="space-y-4">
+      {% for item in items %}
+        <article class="bg-white rounded-xl border shadow-sm p-4 flex justify-between items-center">
+          <div>
+            <p class="font-semibold">{{ item.producto.nombre }}</p>
+
+            {% if item.producto.tipo == "servicio" %}
+              <p class="text-xs text-blue-700">Servicio - puedes agendar hora</p>
+            {% elif item.producto.tipo == "menu" %}
+              <p class="text-xs text-gray-500">Comida / Menú</p>
+            {% else %}
+              <p class="text-xs text-gray-500">Producto</p>
+            {% endif %}
+
+            <p class="text-sm text-gray-600">Cantidad: {{ item.cantidad }}</p>
+          </div>
+
+          <div class="text-right">
+            <p class="font-bold text-green-700">$ {{ item.subtotal }}</p>
+
+            <form method="post" action="{% url 'quitar_del_carrito' item.producto.id %}" class="mt-1">
+              {% csrf_token %}
+              <button class="text-xs text-red-600 hover:underline">Quitar</button>
+            </form>
+
+            {% if item.producto.tipo == "servicio" %}
+              <a href="{% url 'agendar_servicio' item.producto.id %}"
+                 class="mt-2 inline-block text-xs text-blue-700 underline">
+                Buscar hora disponible
+              </a>
+            {% endif %}
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+
+    <div class="mt-4 flex justify-between items-center">
+      <form method="post" action="{% url 'vaciar_carrito' %}">
+        {% csrf_token %}
+        <button class="text-sm text-red-600 underline">Vaciar carrito</button>
+      </form>
+      <p class="text-lg font-bold">Total: $ {{ total }}</p>
+    </div>
+  {% else %}
+    <p>No tienes productos en el carrito.</p>
+  {% endif %}
+</div>
+{% endblock %}

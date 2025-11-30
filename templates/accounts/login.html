@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<form method="post">
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ next }}">
+  <!-- resto del formulario -->
+</form>
+<div class="relative min-h-[80vh] rounded-2xl overflow-hidden">
+  <!-- Fondo dinámico -->
+  <div class="absolute inset-0">
+    <div id="bg-paillaco" class="w-full h-full bg-cover bg-center transition-all duration-700"></div>
+    <div class="absolute inset-0 bg-black/40"></div>
+  </div>
+
+  <!-- Contenido (tarjeta) -->
+  <div class="relative z-10 flex items-center justify-center min-h-[80vh] p-6">
+    <div class="w-full max-w-md bg-white/60 backdrop-blur-md border border-white/60 rounded-2xl shadow-xl p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <!-- Logo municipal -->
+        <img src="https://datos.gob.cl/uploads/group/2015-12-03-140749.826547logomunitransparente.png"
+             class="h-10 w-10 object-contain" alt="Paillaco">
+        <h1 class="text-2xl font-bold">Ingresar</h1>
+      </div>
+
+      <form method="post" class="space-y-4">
+        {% csrf_token %}
+        {{ form.as_p }}
+        {% if form.errors %}
+          <p class="text-sm text-red-700 bg-red-50 p-2 rounded">Revisa los campos.</p>
+        {% endif %}
+        <button class="w-full px-4 py-2 rounded bg-green-600 text-white">Entrar</button>
+      </form>
+
+      <p class="text-sm mt-4 text-center">
+        ¿No tienes cuenta?
+        <a class="underline" href="{% url 'signup' %}">Regístrate</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Script para rotar imágenes de fondo -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const bg = document.getElementById("bg-paillaco");
+    if (!bg) return;
+
+    const imagenes = [
+      "https://www.elinformadorvaldiviano.cl/wp-content/uploads/2020/04/paillaco.jpg",
+      "https://www.cultura.gob.cl/wp-content/uploads/2021/04/artesania-scaled.jpg",
+      "https://ayudaenaccion.org.pe/uploads/2023/04/1M2A4070-scaled.jpg",
+      "https://www.datoavisos.cl/wp-content/uploads/2024/09/234811001_m_normal_none.jpg"
+      // puedes agregar más URLs aquí
+    ];
+
+    let index = 0;
+
+    function cambiarFondo() {
+      bg.style.backgroundImage = `url('${imagenes[index]}')`;
+      index = (index + 1) % imagenes.length;
+    }
+
+    // Fondo inicial
+    cambiarFondo();
+    // Cambia cada segundo (si quieres más lento, sube a 5000 o 7000)
+    setInterval(cambiarFondo, 1000);
+  });
+</script>
+{% endblock %}

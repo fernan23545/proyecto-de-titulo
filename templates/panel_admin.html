@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Panel Administrativo{% endblock %}
+
+{% block content %}
+
+<h1 class="text-2xl font-bold mb-6">Panel Administrativo</h1>
+
+<!-- RESUMEN GENERAL -->
+<div class="grid md:grid-cols-3 gap-6 mb-10">
+
+  <div class="bg-white p-6 rounded-xl shadow border">
+    <p class="text-gray-500 text-sm">Emprendimientos Totales</p>
+    <p class="text-3xl font-bold text-green-700">{{ total_emprendimientos }}</p>
+  </div>
+
+  <div class="bg-white p-6 rounded-xl shadow border">
+    <p class="text-gray-500 text-sm">Verificados</p>
+    <p class="text-3xl font-bold text-green-700">{{ total_verificados }}</p>
+  </div>
+
+  <div class="bg-white p-6 rounded-xl shadow border">
+    <p class="text-gray-500 text-sm">Usuarios Registrados</p>
+    <p class="text-3xl font-bold text-green-700">{{ total_usuarios }}</p>
+  </div>
+
+  <div class="bg-white p-6 rounded-xl shadow border">
+    <p class="text-gray-500 text-sm">Visitas Totales</p>
+    <p class="text-3xl font-bold text-green-700">{{ total_visitas }}</p>
+  </div>
+
+  <div class="bg-white p-6 rounded-xl shadow border">
+    <p class="text-gray-500 text-sm">Reservas Totales</p>
+    <p class="text-3xl font-bold text-green-700">{{ total_reservas }}</p>
+  </div>
+
+  <div class="bg-white p-6 rounded-xl shadow border">
+    <p class="text-gray-500 text-sm">Pendientes por Verificar</p>
+    <p class="text-3xl font-bold text-red-600">{{ total_no_verificados }}</p>
+  </div>
+
+</div>
+
+<!-- GRAFICOS SUPERIORES -->
+<div class="grid md:grid-cols-2 gap-6 mb-10">
+
+  <!-- EMPRENDIMIENTOS POR CATEGORÍA -->
+  <div class="bg-white p-6 rounded-xl shadow border">
+    <h2 class="text-lg font-semibold mb-4">Emprendimientos por Categoría</h2>
+    <canvas id="graficoCategorias"></canvas>
+  </div>
+
+  <!-- RESERVAS POR ESTADO -->
+  <div class="bg-white p-6 rounded-xl shadow border">
+    <h2 class="text-lg font-semibold mb-4">Reservas por Estado</h2>
+    <canvas id="graficoReservas"></canvas>
+  </div>
+
+</div>
+
+<!-- EMPRENDIMIENTOS NUEVOS (LINE CHART) -->
+<div class="bg-white p-6 rounded-xl shadow border mb-10">
+  <h2 class="text-lg font-semibold mb-4">Emprendimientos Nuevos (Últimos 6 Meses)</h2>
+  <canvas id="graficoNuevosMes"></canvas>
+</div>
+
+<!-- TOP 5 EMPRENDIMIENTOS -->
+<div class="bg-white p-6 rounded-xl shadow border">
+  <h2 class="text-lg font-semibold mb-4">Top 5 Emprendimientos por Visitas</h2>
+
+  <table class="w-full text-sm">
+    <thead class="border-b">
+      <tr>
+        <th class="py-2 text-left">Nombre</th>
+        <th class="py-2 text-center">Visitas</th>
+        <th class="py-2 text-center">Estado</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for e in top_emprendimientos %}
+      <tr class="border-b">
+        <td class="py-2">{{ e.nombre }}</td>
+        <td class="py-2 text-center font-bold">{{ e.visitas }}</td>
+        <td class="py-2 text-center">
+          {% if e.is_verified %}
+            <span class="text-green-600">Verificado</span>
+          {% else %}
+            <span class="text-gray-500">No</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+
+  </table>
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// === CATEGORIAS ===
+new Chart(document.getElementById('graficoCategorias'), {
+  type: 'pie',
+  data: {
+    labels: {{ categorias_labels|safe }},
+    datasets: [{
+      data: {{ categorias_cantidad|safe }},
+      backgroundColor: ['#16a34a','#65a30d','#22c55e','#059669','#0d9488','#22d3ee']
+    }]
+  }
+});
+
+// === RESERVAS ===
+new Chart(document.getElementById('graficoReservas'), {
+  type: 'doughnut',
+  data: {
+    labels: {{ reservas_labels|safe }},
+    datasets: [{
+      data: {{ reservas_cantidad|safe }},
+      backgroundColor: ['#eab308','#f97316','#16a34a','#ef4444']
+    }]
+  }
+});
+
+// === NUEVOS POR MES ===
+new Chart(document.getElementById('graficoNuevosMes'), {
+  type: 'line',
+  data: {
+    labels: {{ meses|safe }},
+    datasets: [{
+      label: 'Nuevos por mes',
+      data: {{ nuevos_por_mes|safe }},
+      borderColor: '#16a34a',
+      backgroundColor: '#bbf7d0',
+      fill: true,
+      tension: 0.3
+    }]
+  }
+});
+</script>
+
+{% endblock %}
