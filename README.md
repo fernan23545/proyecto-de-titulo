@@ -22,9 +22,9 @@ cd proyecto-de-titulo
 
 2. Crea y activa el entorno virtual
 python -m venv env
-# En Windows:
+ En Windows:
 env\Scripts\activate
-# En Mac/Linux:
+ En Mac/Linux:
 source env/bin/activate
 
 3. Instala las dependencias
