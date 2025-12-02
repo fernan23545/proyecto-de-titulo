@@ -7,9 +7,7 @@ from .models import Emprendimiento, Producto, Reserva, CarritoItem
 from .forms import EmprendimientoForm, ProductoForm, ReservaForm
 from django.contrib.auth import get_user_model
 from django.utils.timezone import now
-from datetime import timedelta
-
-
+from datetime import timedelta, datetime, time
 
 @login_required
 def emprendimiento_eliminar(request, pk):
@@ -37,7 +35,7 @@ def home_view(request):
 
     emprendimientos = Emprendimiento.objects.filter(is_verified=True)
 
-    # Agrupar por categoría EN PYTHON (lo correcto)
+   
     categorias_dict = {}
     for e in emprendimientos:
         if e.categoria not in categorias_dict:
@@ -56,7 +54,7 @@ def home_view(request):
     return render(request, "home.html", {
         "emprendimientos_home": emprendimientos,
         "categorias": Emprendimiento.CATEGORIAS,
-        "categorias_dict": categorias_dict,   # ← ESTA LÍNEA ES LA IMPORTANTE
+        "categorias_dict": categorias_dict,   
         "hero_images": hero_images,
     })
 
@@ -115,7 +113,7 @@ def emprendimiento_detalle(request, pk):
     reserva_form = None
     mensaje_reserva = None
 
-    if emprendimiento.categoria == "servicios":   # ← CORREGIDO
+    if emprendimiento.categoria == "servicios":   
         servicios_ofrecidos = productos_qs.filter(tipo="servicio")
 
         if request.method == "POST":
@@ -204,7 +202,7 @@ def crear_producto(request, pk):
     emprendimiento = get_object_or_404(Emprendimiento, pk=pk, owner=request.user)
 
     if request.method == "POST":
-        form = ProductoForm(request.POST, request.FILES)   # << IMPORTANTE
+        form = ProductoForm(request.POST, request.FILES)   
         if form.is_valid():
             producto = form.save(commit=False)
             producto.emprendimiento = emprendimiento
@@ -295,13 +293,23 @@ def mis_reservas(request):
 
 @login_required
 def cambiar_estado_reserva(request, reserva_id, nuevo_estado):
-    reserva = get_object_or_404(Reserva, id=reserva_id, emprendimiento__owner=request.user)
+    reserva = get_object_or_404(Reserva, id=reserva_id)
 
-    if nuevo_estado not in {"pendiente","en_proceso","completado","cancelado"}:
-        return redirect("mis_reservas")
+    # Validación estado permitido
+    if nuevo_estado not in {"pendiente", "en_proceso", "completado", "cancelado"}:
+        messages.error(request, "Estado inválido.")
+        return redirect("reservas_emprendedor")
 
+    # Cambiar el estado
     reserva.estado = nuevo_estado
     reserva.save()
+    messages.success(request, "Estado actualizado correctamente.")
+
+    #  Si el usuario es EL DUEÑO del emprendimiento → va al panel del emprendedor
+    if reserva.emprendimiento.owner == request.user:
+        return redirect("reservas_emprendedor")
+
+    #  Si es un cliente → vuelve a sus reservas
     return redirect("mis_reservas")
 
 
@@ -471,4 +479,111 @@ def producto_eliminar(request, producto_id):
 
     return render(request, "marketplace/producto_confirmar_eliminar.html", {
         "producto": producto
+    })
+@login_required
+def agendar_servicio(request, producto_id):
+    producto = get_object_or_404(Producto, id=producto_id, tipo="servicio")
+    emprendimiento = producto.emprendimiento
+
+    # ------------------------------------------------
+    # FUNCION PARA GENERAR HORARIOS DISPONIBLES
+    # ------------------------------------------------
+    def generar_horarios_disponibles():
+        hora_inicio = time(8, 0)      # 08:00
+        hora_fin = time(20, 0)        # 20:00
+
+        duracion = timedelta(hours=2)         # duración servicio
+        descanso = timedelta(minutes=20)      # descanso entre clientes
+        intervalo = duracion + descanso       # total 2h 20min
+
+        horarios = []
+        actual = datetime.combine(datetime.today(), hora_inicio)
+        fin = datetime.combine(datetime.today(), hora_fin)
+
+        while actual + duracion <= fin:
+            horarios.append(actual.time())
+            actual += intervalo
+
+        return horarios
+
+    # =======================================================
+    # 1) INICIALIZAR FORMULARIO (siempre debe existir)
+    # =======================================================
+    form = ReservaForm(initial={"servicio": producto.nombre})
+
+    horarios_disponibles = []
+    fecha_param = request.GET.get("fecha")
+
+    # =======================================================
+    # 2) SI SE SELECCIONÓ UNA FECHA → CALCULAR HORARIOS
+    # =======================================================
+    if fecha_param:
+        fecha_seleccionada = datetime.strptime(fecha_param, "%Y-%m-%d").date()
+
+        # Bloquear sábado (5) y domingo (6)
+        if fecha_seleccionada.weekday() < 5:  
+            reservas_tomadas = Reserva.objects.filter(
+                emprendimiento=emprendimiento,
+                fecha=fecha_seleccionada
+            ).values_list("hora", flat=True)
+
+            reservas_str = [r.strftime("%H:%M") for r in reservas_tomadas]
+
+            todos = generar_horarios_disponibles()
+
+            horarios_disponibles = [
+                h.strftime("%H:%M")
+                for h in todos
+                if h.strftime("%H:%M") not in reservas_str
+            ]
+
+    # =======================================================
+    # 3) PROCESAR POST
+    # =======================================================
+    if request.method == "POST":
+        form = ReservaForm(request.POST)
+        if form.is_valid():
+            reserva = form.save(commit=False)
+            reserva.emprendimiento = emprendimiento
+            reserva.servicio = producto.nombre
+            reserva.usuario = request.user    
+            reserva.producto = producto       
+
+            reserva.save()
+            messages.success(request, "Reserva realizada correctamente.")
+            return redirect("emprendimiento_detalle", pk=emprendimiento.pk)
+
+    # =======================================================
+    # 4) RENDER
+    # =======================================================
+    return render(request, "marketplace/agendar_servicio.html", {
+        "form": form,
+        "producto": producto,
+        "emprendimiento": emprendimiento,
+        "horarios_disponibles": horarios_disponibles,
+    })
+@login_required
+@login_required
+def mis_reservas(request):
+    usuario = request.user
+
+    # Reservas hechas por el usuario como cliente
+    reservas_cliente = Reserva.objects.filter(
+        usuario=usuario
+    ).order_by("-fecha", "-hora")
+
+    return render(request, "marketplace/mis_reservas.html", {
+        "reservas_cliente": reservas_cliente,
+    })
+@login_required
+def reservas_emprendedor(request):
+    reservas = Reserva.objects.filter(
+        emprendimiento__owner=request.user
+    ).select_related("emprendimiento", "producto").order_by("-fecha", "-hora")
+
+    return render(request, "marketplace/reservas_emprendedor.html", {
+        "reservas_pendientes": reservas.filter(estado="pendiente"),
+        "reservas_en_proceso": reservas.filter(estado="en_proceso"),
+        "reservas_completadas": reservas.filter(estado="completado"),
+        "reservas_canceladas": reservas.filter(estado="cancelado"),
     })
