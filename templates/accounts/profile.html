@@ -1,26 +1,67 @@
 {% extends "base.html" %}
-
 {% block content %}
-<div class="max-w-xl mx-auto">
-  <h1 class="text-2xl font-bold mb-4">Mi perfil</h1>
 
-  <div class="bg-white rounded-2xl shadow border p-6 space-y-3">
-    <p><span class="font-semibold">Usuario:</span> {{ request.user.username }}</p>
-    <p><span class="font-semibold">Correo:</span> {{ request.user.email }}</p>
-    <p><span class="font-semibold">Nombre completo:</span>
-      {% if request.user.get_full_name %}
-        {{ request.user.get_full_name }}
-      {% else %}
-        (no registrado)
-      {% endif %}
-    </p>
-  </div>
+<div class="max-w-4xl mx-auto space-y-10">
 
-  <div class="mt-4">
-    <a href="{% url 'logout' %}"
-       class="inline-block px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700">
-      Cerrar sesión
+  <!-- Perfil -->
+  <section class="bg-white p-6 rounded-2xl shadow border">
+    <h1 class="text-3xl font-bold mb-4">Mi perfil</h1>
+
+    <p><strong>Usuario:</strong> {{ request.user.username }}</p>
+    <p><strong>Correo:</strong> {{ request.user.email }}</p>
+    <p><strong>Nombre completo:</strong> {{ request.user.get_full_name }}</p>
+
+    
+  </section>
+
+
+  <!-- SECCIÓN MIS RESERVAS -->
+  <section class="bg-white p-6 rounded-2xl shadow border">
+    <h2 class="text-2xl font-bold mb-4">Mis reservas</h2>
+
+    {% if reservas_cliente %}
+      <div class="space-y-3">
+
+        {% for r in reservas_cliente %}
+        <div class="p-4 border rounded-xl bg-gray-50">
+
+          <p class="font-semibold text-lg">
+            {{ r.servicio }} — <span class="text-gray-700">{{ r.emprendimiento.nombre }}</span>
+          </p>
+
+          <p class="text-sm text-gray-600">
+            {{ r.fecha }} a las {{ r.hora }}
+          </p>
+
+          {% if r.comentario %}
+          <p class="text-xs mt-1 text-gray-700">
+            Comentario: {{ r.comentario }}
+          </p>
+          {% endif %}
+
+          <!-- Estado de la reserva -->
+          <span class="mt-2 inline-block px-2 py-1 text-xs rounded-full
+            {% if r.estado == 'pendiente' %} bg-yellow-100 text-yellow-800
+            {% elif r.estado == 'en_proceso' %} bg-blue-100 text-blue-800
+            {% elif r.estado == 'completado' %} bg-green-100 text-green-800
+            {% elif r.estado == 'cancelado' %} bg-red-100 text-red-800
+            {% endif %}
+          ">
+            {{ r.get_estado_display }}
+          </span>
+
+        </div>
+        {% endfor %}
+
+      </div>
+    {% else %}
+      <p class="text-gray-600">Aún no has realizado reservas.</p>
+    {% endif %}
+  </section>
+<a href="{% url 'logout' %}"
+       class="inline-block mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+       Cerrar sesión
     </a>
-  </div>
 </div>
+
 {% endblock %}

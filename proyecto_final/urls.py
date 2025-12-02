@@ -43,8 +43,11 @@ urlpatterns = [
     # EDITAR EMPRENDIMIENTO
     path("emprendimiento/<int:pk>/editar/", marketplace_views.emprendimiento_editar, name="emprendimiento_editar"),
 
-# ELIMINAR EMPRENDIMIENTO
+    # ELIMINAR EMPRENDIMIENTO
     path("emprendimiento/<int:pk>/eliminar/", marketplace_views.emprendimiento_eliminar, name="emprendimiento_eliminar"),
+    path("", include("marketplace.urls")),
+    path("mis-emprendimientos/reservas/", marketplace_views.reservas_emprendedor, name="reservas_emprendedor"),
+
 
 ]
 

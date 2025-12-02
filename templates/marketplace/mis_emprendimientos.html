@@ -4,24 +4,30 @@
 <h1 class="text-2xl font-bold mb-4">Mis emprendimientos</h1>
 
 {% if emprendimientos %}
+  
+  <!-- BOTÓN: VER RESERVAS DE MIS EMPRENDIMIENTOS -->
   <div class="flex justify-end mb-4">
-    <a href="{% url 'mis_reservas' %}"
+    <a href="{% url 'reservas_emprendedor' %}"
        class="px-3 py-1 rounded bg-blue-600 text-white text-sm hover:bg-blue-700">
-      Ver reservas
+      Ver reservas de mis servicios
     </a>
   </div>
 
   <div class="space-y-4">
     {% for e in emprendimientos %}
       <article class="bg-white rounded-xl border shadow p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+
         <div>
           <h2 class="font-semibold text-lg">{{ e.nombre }}</h2>
+
           <p class="text-sm text-gray-600">
             {{ e.get_categoria_display }}{% if e.rubro %} • {{ e.rubro }}{% endif %}
           </p>
+
           <p class="text-xs text-gray-500 mt-1">
             Visitas al perfil: {{ e.visitas }}
           </p>
+
           <p class="text-xs mt-1">
             Estado:
             {% if e.is_verified %}
@@ -43,6 +49,7 @@
             Agregar productos
           </a>
         </div>
+
       </article>
     {% endfor %}
   </div>

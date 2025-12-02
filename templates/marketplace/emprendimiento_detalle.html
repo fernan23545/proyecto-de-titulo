@@ -117,9 +117,8 @@
 
     </div>
 
-    <!-- GALERÍA DE IMÁGENES EXTRA -->
+    <!-- GALERÍA -->
     {% if emprendimiento.imagen1 or emprendimiento.imagen2 or emprendimiento.imagen3 %}
-
     <h2 class="text-2xl font-bold text-gray-800 mb-4">Galería</h2>
 
     <div class="grid md:grid-cols-3 gap-6">
@@ -143,13 +142,15 @@
         {% endif %}
 
     </div>
-
     {% endif %}
-    <!-- SECCIÓN PRODUCTOS / SERVICIOS -->
+
+
+<!-- ========================================== -->
+<!-- PRODUCTOS + SERVICIOS (TARJETAS PRINCIPALES) -->
+<!-- ========================================== -->
+
 {% if productos_generales or menu_items or servicios_ofrecidos %}
-<h2 class="text-3xl font-bold text-gray-800 mt-12 mb-6">
-    Productos & Servicios
-</h2>
+<h2 class="text-3xl font-bold text-gray-800 mt-12 mb-6">Productos & Servicios</h2>
 
 <div class="grid md:grid-cols-3 gap-6">
 
@@ -184,7 +185,6 @@
         {% endfor %}
     {% endif %}
 
-
     <!-- SERVICIOS -->
     {% if servicios_ofrecidos %}
         {% for p in servicios_ofrecidos %}
@@ -209,8 +209,7 @@
         {% endfor %}
     {% endif %}
 
-
-    <!-- MENÚ (categoría comida) -->
+    <!-- MENÚ (categoria comida) -->
     {% if menu_items %}
         {% for p in menu_items %}
         <div class="bg-white border rounded-2xl shadow hover:shadow-lg transition overflow-hidden">
@@ -238,36 +237,41 @@
 
 </div>
 {% endif %}
-{% for p in productos_generales %}
 
-<div class="bg-white p-4 rounded-xl shadow-lg">
 
-    <h3 class="font-semibold text-gray-800 text-lg">{{ p.nombre }}</h3>
-    <p class="text-gray-600 text-sm">{{ p.descripcion }}</p>
-    <p class="text-green-700 font-bold mt-1">${{ p.precio }}</p>
+<!-- ========================================== -->
+<!-- SEGUNDA SECCIÓN (edición del dueño) -->
+<!-- ========================================== -->
 
-    {% if user.is_authenticated and user == emprendimiento.owner %}
-    <div class="flex gap-2 mt-3">
+{% if productos_generales %}
+    {% for p in productos_generales %}
 
-        <a href="{% url 'producto_editar' p.id %}"
-           class="flex-1 text-center bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 text-sm">
-            Editar
-        </a>
+    <div class="bg-white p-4 rounded-xl shadow-lg mt-8">
 
-        <a href="{% url 'producto_eliminar' p.id %}"
-           class="flex-1 text-center bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 text-sm">
-            Eliminar
-        </a>
+        <h3 class="font-semibold text-gray-800 text-lg">{{ p.nombre }}</h3>
+        <p class="text-gray-600 text-sm">{{ p.descripcion }}</p>
+        <p class="text-green-700 font-bold mt-1">${{ p.precio }}</p>
+
+        {% if user.is_authenticated and user == emprendimiento.owner %}
+        <div class="flex gap-2 mt-3">
+
+            <a href="{% url 'producto_editar' producto_id=p.id %}"
+               class="flex-1 text-center bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 text-sm">
+                Editar
+            </a>
+
+            <a href="{% url 'producto_eliminar' producto_id=p.id %}"
+               class="flex-1 text-center bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 text-sm">
+                Eliminar
+            </a>
+
+        </div>
+        {% endif %}
 
     </div>
-    {% endif %}
 
-</div>
-
-{% endfor %}
-
-
-
+    {% endfor %}
+{% endif %}
 
 </div>
 

@@ -1,177 +1,72 @@
 {% extends "base.html" %}
-
 {% block content %}
+
 <div class="max-w-5xl mx-auto space-y-6">
 
-  <h1 class="text-2xl font-bold mb-2">Reservas de mis emprendimientos</h1>
-  <p class="text-sm text-gray-600 mb-4">
-    Aquí ves todas las reservas realizadas a tus emprendimientos y puedes
-    actualizar el estado del servicio (pendiente, en proceso, completado, cancelado).
-  </p>
+  {% if rol == "cliente" %}
+    <h1 class="text-2xl font-bold">Mis reservas</h1>
+    <p class="text-sm text-gray-600 mb-4">Estas son las reservas que tú has realizado.</p>
 
-  {% if messages %}
-    <div class="space-y-2">
-      {% for message in messages %}
-        <div class="px-3 py-2 rounded text-sm
-             {% if message.tags == 'success' %}bg-green-50 text-green-800 border border-green-200
-             {% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200
-             {% else %}bg-gray-50 text-gray-800 border{% endif %}">
-          {{ message }}
+    {% if reservas_cliente %}
+      <div class="space-y-3">
+        {% for r in reservas_cliente %}
+        <div class="bg-white p-4 rounded-2xl border shadow-sm">
+          <p class="font-semibold">{{ r.servicio }} — {{ r.emprendimiento.nombre }}</p>
+          <p class="text-sm text-gray-600">{{ r.fecha }} a las {{ r.hora }}</p>
+          {% if r.comentario %}
+          <p class="text-xs mt-1">Comentario: {{ r.comentario }}</p>
+          {% endif %}
+          <span class="inline-block mt-2 px-2 py-1 text-xs rounded-full bg-gray-100">
+            {{ r.get_estado_display }}
+          </span>
         </div>
-      {% endfor %}
-    </div>
-  {% endif %}
-
-  {% if reservas_pendientes or reservas_en_proceso or reservas_completadas or reservas_canceladas %}
-
-    {# PENDIENTES #}
-    {% if reservas_pendientes %}
-      <section class="bg-white rounded-2xl border shadow p-4">
-        <h2 class="text-lg font-semibold mb-3">Pendientes</h2>
-        <div class="divide-y">
-          {% for r in reservas_pendientes %}
-            <article class="py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-              <div>
-                <p class="font-semibold">
-                  {{ r.nombre_cliente }} – {{ r.emprendimiento.nombre }}
-                </p>
-                <p class="text-xs text-gray-600">
-                  {{ r.fecha }} {{ r.hora }}{% if r.servicio %} • {{ r.servicio }}{% endif %}
-                </p>
-                {% if r.producto %}
-                  <p class="text-xs text-gray-500">
-                    Producto/servicio: {{ r.producto.nombre }}
-                  </p>
-                {% endif %}
-                {% if r.comentario %}
-                  <p class="text-xs text-gray-500 mt-1">
-                    Comentario: {{ r.comentario }}
-                  </p>
-                {% endif %}
-              </div>
-              <div class="flex flex-wrap gap-2 text-xs">
-                <span class="inline-flex items-center px-2 py-1 rounded-full bg-yellow-100 text-yellow-800">
-                  {{ r.get_estado_display }}
-                </span>
-
-                <a href="{% url 'cambiar_estado_reserva' r.id 'en_proceso' %}"
-                   class="px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700">
-                  Marcar en proceso
-                </a>
-                <a href="{% url 'cambiar_estado_reserva' r.id 'completado' %}"
-                   class="px-2 py-1 rounded bg-green-600 text-white hover:bg-green-700">
-                  Marcar completado
-                </a>
-                <a href="{% url 'cambiar_estado_reserva' r.id 'cancelado' %}"
-                   class="px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700">
-                  Cancelar
-                </a>
-              </div>
-            </article>
-          {% endfor %}
-        </div>
-      </section>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-gray-600">No tienes reservas realizadas.</p>
     {% endif %}
+  
 
-    {# EN PROCESO #}
-    {% if reservas_en_proceso %}
-      <section class="bg-white rounded-2xl border shadow p-4">
-        <h2 class="text-lg font-semibold mb-3">En proceso</h2>
-        <div class="divide-y">
-          {% for r in reservas_en_proceso %}
-            <article class="py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-              <div>
-                <p class="font-semibold">
-                  {{ r.nombre_cliente }} – {{ r.emprendimiento.nombre }}
-                </p>
-                <p class="text-xs text-gray-600">
-                  {{ r.fecha }} {{ r.hora }}{% if r.servicio %} • {{ r.servicio }}{% endif %}
-                </p>
-              </div>
-              <div class="flex flex-wrap gap-2 text-xs">
-                <span class="inline-flex items-center px-2 py-1 rounded-full bg-blue-100 text-blue-800">
-                  {{ r.get_estado_display }}
-                </span>
-                <a href="{% url 'cambiar_estado_reserva' r.id 'completado' %}"
-                   class="px-2 py-1 rounded bg-green-600 text-white hover:bg-green-700">
-                  Marcar completado
-                </a>
-                <a href="{% url 'cambiar_estado_reserva' r.id 'cancelado' %}"
-                   class="px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700">
-                  Cancelar
-                </a>
-              </div>
-            </article>
-          {% endfor %}
+  {% elif rol == "emprendedor" %}
+    <h1 class="text-2xl font-bold">Reservas de mis emprendimientos</h1>
+    <p class="text-sm text-gray-600 mb-4">Aquí ves todas las reservas hechas a tus negocios.</p>
+
+    {% if reservas_emprendedor %}
+      <div class="space-y-3">
+        {% for r in reservas_emprendedor %}
+        <div class="bg-white p-4 rounded-2xl border shadow-sm flex justify-between items-center">
+          <div>
+            <p class="font-semibold">{{ r.nombre_cliente }} — {{ r.servicio }}</p>
+            <p class="text-sm text-gray-600">
+              {{ r.fecha }} a las {{ r.hora }} • {{ r.emprendimiento.nombre }}
+            </p>
+            {% if r.comentario %}
+              <p class="text-xs mt-1">Comentario: {{ r.comentario }}</p>
+            {% endif %}
+          </div>
+
+          <div class="flex gap-2 text-xs">
+            <a href="{% url 'cambiar_estado_reserva' r.id 'pendiente' %}" class="px-2 py-1 bg-yellow-500 text-white rounded">
+              Pendiente
+            </a>
+            <a href="{% url 'cambiar_estado_reserva' r.id 'en_proceso' %}" class="px-2 py-1 bg-blue-600 text-white rounded">
+              En proceso
+            </a>
+            <a href="{% url 'cambiar_estado_reserva' r.id 'completado' %}" class="px-2 py-1 bg-green-600 text-white rounded">
+              Completado
+            </a>
+            <a href="{% url 'cambiar_estado_reserva' r.id 'cancelado' %}" class="px-2 py-1 bg-red-600 text-white rounded">
+              Cancelado
+            </a>
+          </div>
         </div>
-      </section>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-gray-600">Aún no tienes reservas en tus emprendimientos.</p>
     {% endif %}
-
-    {# COMPLETADAS #}
-    {% if reservas_completadas %}
-      <section class="bg-white rounded-2xl border shadow p-4">
-        <h2 class="text-lg font-semibold mb-3">Completadas</h2>
-        <div class="divide-y">
-          {% for r in reservas_completadas %}
-            <article class="py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-              <div>
-                <p class="font-semibold">
-                  {{ r.nombre_cliente }} – {{ r.emprendimiento.nombre }}
-                </p>
-                <p class="text-xs text-gray-600">
-                  {{ r.fecha }} {{ r.hora }}{% if r.servicio %} • {{ r.servicio }}{% endif %}
-                </p>
-              </div>
-              <div class="flex flex-wrap gap-2 text-xs">
-                <span class="inline-flex items-center px-2 py-1 rounded-full bg-green-100 text-green-800">
-                  {{ r.get_estado_display }}
-                </span>
-                <a href="{% url 'cambiar_estado_reserva' r.id 'pendiente' %}"
-                   class="px-2 py-1 rounded bg-yellow-500 text-white hover:bg-yellow-600">
-                  Volver a pendiente
-                </a>
-              </div>
-            </article>
-          {% endfor %}
-        </div>
-      </section>
-    {% endif %}
-
-    {# CANCELADAS #}
-    {% if reservas_canceladas %}
-      <section class="bg-white rounded-2xl border shadow p-4">
-        <h2 class="text-lg font-semibold mb-3">Canceladas</h2>
-        <div class="divide-y">
-          {% for r in reservas_canceladas %}
-            <article class="py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-              <div>
-                <p class="font-semibold">
-                  {{ r.nombre_cliente }} – {{ r.emprendimiento.nombre }}
-                </p>
-                <p class="text-xs text-gray-600">
-                  {{ r.fecha }} {{ r.hora }}{% if r.servicio %} • {{ r.servicio }}{% endif %}
-                </p>
-              </div>
-              <div class="flex flex-wrap gap-2 text-xs">
-                <span class="inline-flex items-center px-2 py-1 rounded-full bg-red-100 text-red-800">
-                  {{ r.get_estado_display }}
-                </span>
-                <a href="{% url 'cambiar_estado_reserva' r.id 'pendiente' %}"
-                   class="px-2 py-1 rounded bg-yellow-500 text-white hover:bg-yellow-600">
-                  Volver a pendiente
-                </a>
-              </div>
-            </article>
-          {% endfor %}
-        </div>
-      </section>
-    {% endif %}
-
-  {% else %}
-    <p class="text-gray-600">
-      Aún no tienes reservas en tus emprendimientos.
-    </p>
   {% endif %}
 
 </div>
+
 {% endblock %}

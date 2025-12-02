@@ -83,10 +83,20 @@ def login_view(request):
 # -----------------------------
 # PERFIL DEL USUARIO
 # -----------------------------
+from marketplace.models import Reserva
+
 @login_required
 def profile_view(request):
-    return render(request, "accounts/profile.html")
+    usuario = request.user
+    
+    # Reservas hechas por este usuario
+    reservas_cliente = Reserva.objects.filter(
+        usuario=usuario
+    ).order_by("-fecha", "-hora")
 
+    return render(request, "accounts/profile.html", {
+        "reservas_cliente": reservas_cliente
+    })
 
 # -----------------------------
 # CERRAR SESIÓN

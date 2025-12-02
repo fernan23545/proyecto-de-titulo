@@ -11,7 +11,7 @@ urlpatterns = [
     # Directorio
     path("directorio/", directory_view, name="directory"),
 
-    # 🔥 DETALLE (FALTABA ESTA RUTA)
+    #  DETALLE (FALTABA ESTA RUTA)
     path("directorio/<int:pk>/", views.emprendimiento_detalle, name="emprendimiento_detalle"),
 
     # Cuenta
@@ -28,5 +28,7 @@ urlpatterns = [
 
     # ELIMINAR PRODUCTO
     path("producto/<int:producto_id>/eliminar/", views.producto_eliminar, name="producto_eliminar"),
+    path("mis-emprendimientos/reservas/", views.reservas_emprendedor, name="reservas_emprendedor"),
+
 
 ]
